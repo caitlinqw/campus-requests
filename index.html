@@ -775,41 +775,82 @@
 </main>
 
 <script>
-  let cur = 1;
+  var cur = 1;
 
   function goTo(n) {
-    if (n > cur && !validate(cur)) return;
-    // update tabs
-    const tabs = [null, 'pt1', 'pt2', 'pt3'];
-    const lines = [null, 'pl1', 'pl2'];
-    document.getElementById(`step-${cur}`).classList.remove('active');
-    document.getElementById(tabs[cur]).classList.remove('active');
-    if (n > cur) document.getElementById(tabs[cur]).classList.add('done');
-    if (n > cur && cur <= 2) document.getElementById(lines[cur]).classList.add('done');
+    if (n > cur) {
+      if (!validate(cur)) return;
+    }
+
+    var oldStep = document.getElementById('step-' + cur);
+    var oldTab = document.getElementById('pt' + cur);
+    oldStep.classList.remove('active');
+    oldTab.classList.remove('active');
+
+    if (n > cur) {
+      oldTab.classList.add('done');
+      if (cur <= 2) {
+        document.getElementById('pl' + cur).classList.add('done');
+      }
+    }
+
     cur = n;
-    document.getElementById(`step-${cur}`).classList.add('active');
-    document.getElementById(tabs[cur]).classList.add('active');
-    if (n === 3) buildReview();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    var newStep = document.getElementById('step-' + cur);
+    var newTab = document.getElementById('pt' + cur);
+    newStep.classList.add('active');
+    newTab.classList.add('active');
+
+    if (cur === 3) {
+      buildReview();
+    }
+
+    window.scrollTo(0, 0);
   }
 
   function validate(step) {
-    let ok = true;
-    const flag = id => { document.getElementById(id)?.classList.add('invalid'); ok = false; };
-    const clear = id => document.getElementById(id)?.classList.remove('invalid');
+    var ok = true;
+
     if (step === 1) {
-      ['f-fn','f-ln','f-em','f-ca'].forEach(clear);
-      if (!document.getElementById('firstName').value.trim()) flag('f-fn');
-      if (!document.getElementById('lastName').value.trim()) flag('f-ln');
-      const e = document.getElementById('email').value.trim();
-      if (!e || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) flag('f-em');
-      if (!document.getElementById('campus').value) flag('f-ca');
+      document.getElementById('f-fn').classList.remove('invalid');
+      document.getElementById('f-ln').classList.remove('invalid');
+      document.getElementById('f-em').classList.remove('invalid');
+      document.getElementById('f-ca').classList.remove('invalid');
+
+      if (!document.getElementById('firstName').value.trim()) {
+        document.getElementById('f-fn').classList.add('invalid');
+        ok = false;
+      }
+      if (!document.getElementById('lastName').value.trim()) {
+        document.getElementById('f-ln').classList.add('invalid');
+        ok = false;
+      }
+      var email = document.getElementById('email').value.trim();
+      var emailOk = email.length > 0 && email.indexOf('@') > 0 && email.indexOf('.') > 0;
+      if (!emailOk) {
+        document.getElementById('f-em').classList.add('invalid');
+        ok = false;
+      }
+      if (!document.getElementById('campus').value) {
+        document.getElementById('f-ca').classList.add('invalid');
+        ok = false;
+      }
     }
+
     if (step === 2) {
-      ['f-ti','f-de'].forEach(clear);
-      if (!document.getElementById('reqTitle').value.trim()) flag('f-ti');
-      if (document.getElementById('reqDesc').value.trim().length < 20) flag('f-de');
+      document.getElementById('f-ti').classList.remove('invalid');
+      document.getElementById('f-de').classList.remove('invalid');
+
+      if (!document.getElementById('reqTitle').value.trim()) {
+        document.getElementById('f-ti').classList.add('invalid');
+        ok = false;
+      }
+      if (document.getElementById('reqDesc').value.trim().length < 20) {
+        document.getElementById('f-de').classList.add('invalid');
+        ok = false;
+      }
     }
+
     return ok;
   }
 
@@ -818,80 +859,114 @@
   }
 
   function getCats() {
-    return Array.from(document.querySelectorAll('.chip-input:checked')).map(c => c.value).join(', ') || 'Not specified';
+    var checked = document.querySelectorAll('.chip-input:checked');
+    var vals = [];
+    for (var i = 0; i < checked.length; i++) {
+      vals.push(checked[i].value);
+    }
+    return vals.length > 0 ? vals.join(', ') : 'Not specified';
   }
 
   function getTL() {
-    const el = document.querySelector('.pill-input:checked');
+    var el = document.querySelector('.pill-input:checked');
     return el ? el.value : 'Not specified';
   }
 
   function buildReview() {
-    const fn = document.getElementById('firstName').value;
-    const ln = document.getElementById('lastName').value;
-    const em = document.getElementById('email').value;
-    const ca = document.getElementById('campus').value;
-    const ti = document.getElementById('reqTitle').value;
-    const de = document.getElementById('reqDesc').value;
-    document.getElementById('review-grid').innerHTML = `
-      <div class="review-item"><strong>Name</strong><span>${fn} ${ln}</span></div>
-      <div class="review-item"><strong>Campus</strong><span>${ca}</span></div>
-      <div class="review-item full"><strong>Email</strong><span>${em}</span></div>
-      <div class="review-item full"><strong>Request Title</strong><span>${ti}</span></div>
-      <div class="review-item"><strong>Category</strong><span>${getCats()}</span></div>
-      <div class="review-item"><strong>Timeline</strong><span>${getTL()}</span></div>
-      <div class="review-item full"><strong>Description</strong><span>${de}</span></div>
-    `;
+    var fn = document.getElementById('firstName').value;
+    var ln = document.getElementById('lastName').value;
+    var em = document.getElementById('email').value;
+    var ca = document.getElementById('campus').value;
+    var ti = document.getElementById('reqTitle').value;
+    var de = document.getElementById('reqDesc').value;
+
+    document.getElementById('review-grid').innerHTML =
+      '<div class="review-item"><strong>Name</strong><span>' + fn + ' ' + ln + '</span></div>' +
+      '<div class="review-item"><strong>Campus</strong><span>' + ca + '</span></div>' +
+      '<div class="review-item full"><strong>Email</strong><span>' + em + '</span></div>' +
+      '<div class="review-item full"><strong>Request Title</strong><span>' + ti + '</span></div>' +
+      '<div class="review-item"><strong>Category</strong><span>' + getCats() + '</span></div>' +
+      '<div class="review-item"><strong>Timeline</strong><span>' + getTL() + '</span></div>' +
+      '<div class="review-item full"><strong>Description</strong><span>' + de + '</span></div>';
   }
 
   function submitForm() {
-
-    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/qwasar.io/s/AKfycbxTtJ8dt9m39eJWmKPU3ej2VR48ucMAgG7y9hfHDovz7Kd8bLzJsR1BIdGzy3onMkH9eQ/exec';
+    /*
+    === GOOGLE APPS SCRIPT INTEGRATION ===
+    To connect to Google Sheets:
+    1. In your Google Sheet: Extensions -> Apps Script
+    2. Paste the Apps Script code provided separately
+    3. Deploy as Web App -> copy the URL
+    4. Replace YOUR_SCRIPT_ID below with your deployed URL
+    5. Delete the opening slash-star and closing star-slash to uncomment
+     */
+    var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/qwasar.io/s/AKfycbxTtJ8dt9m39eJWmKPU3ej2VR48ucMAgG7y9hfHDovz7Kd8bLzJsR1BIdGzy3onMkH9eQ/exec';
 
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name:     document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
-        email:    document.getElementById('email').value,
-        campus:   document.getElementById('campus').value,
-        title:    document.getElementById('reqTitle').value,
+        name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        campus: document.getElementById('campus').value,
+        title: document.getElementById('reqTitle').value,
         category: getCats(),
         description: document.getElementById('reqDesc').value,
         timeline: getTL(),
         submitted: new Date().toISOString()
       })
     });
-    */
+   
 
-    document.getElementById(`step-${cur}`).classList.remove('active');
+    document.getElementById('step-' + cur).classList.remove('active');
     document.getElementById('success').classList.add('active');
     document.getElementById('pt3').classList.remove('active');
     document.getElementById('pt3').classList.add('done');
     document.getElementById('pl2').classList.add('done');
 
-    const fn = document.getElementById('firstName').value;
-    const ln = document.getElementById('lastName').value;
+    var fn = document.getElementById('firstName').value;
+    var ln = document.getElementById('lastName').value;
     document.getElementById('success-summary').innerHTML =
-      `<strong>From:</strong> ${fn} ${ln} . ${document.getElementById('campus').value}<br>
-       <strong>Request:</strong> ${document.getElementById('reqTitle').value}<br>
-       <strong>Timeline:</strong> ${getTL()}`;
+      '<strong>From:</strong> ' + fn + ' ' + ln + ' - ' + document.getElementById('campus').value + '<br>' +
+      '<strong>Request:</strong> ' + document.getElementById('reqTitle').value + '<br>' +
+      '<strong>Timeline:</strong> ' + getTL();
   }
 
   function resetForm() {
     document.getElementById('success').classList.remove('active');
-    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
-    ['pt1','pt2','pt3'].forEach(id => { const el = document.getElementById(id); el.classList.remove('active','done'); });
-    ['pl1','pl2'].forEach(id => document.getElementById(id).classList.remove('done'));
+
+    var steps = document.querySelectorAll('.form-step');
+    for (var i = 0; i < steps.length; i++) {
+      steps[i].classList.remove('active');
+    }
+
+    var tabs = ['pt1','pt2','pt3'];
+    for (var i = 0; i < tabs.length; i++) {
+      document.getElementById(tabs[i]).classList.remove('active');
+      document.getElementById(tabs[i]).classList.remove('done');
+    }
+    document.getElementById('pl1').classList.remove('done');
+    document.getElementById('pl2').classList.remove('done');
+
     document.getElementById('step-1').classList.add('active');
     document.getElementById('pt1').classList.add('active');
-    document.querySelectorAll('input[type="text"],input[type="email"],textarea').forEach(i => i.value='');
-    document.querySelectorAll('select').forEach(s => s.selectedIndex=0);
-    document.querySelectorAll('input[type="checkbox"],input[type="radio"]').forEach(i => i.checked=false);
-    document.getElementById('charCount').textContent='0';
+
+    var inputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].value = '';
+    }
+    var selects = document.querySelectorAll('select');
+    for (var i = 0; i < selects.length; i++) {
+      selects[i].selectedIndex = 0;
+    }
+    var checkboxes = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+      checkboxes[i].checked = false;
+    }
+    document.getElementById('charCount').textContent = '0';
     cur = 1;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }
 </script>
 </body>
