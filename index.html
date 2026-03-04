@@ -845,18 +845,8 @@
   }
 
   function submitForm() {
-    /*
-    ╔═══════════════════════════════════════════════════════════════╗
-    ║  GOOGLE APPS SCRIPT INTEGRATION — wire up here               ║
-    ║                                                               ║
-    ║  1. In your Google Sheet: Extensions → Apps Script           ║
-    ║  2. Paste the Apps Script code provided separately           ║
-    ║  3. Deploy as Web App → copy the URL                         ║
-    ║  4. Replace APPS_SCRIPT_URL below with your deployed URL     ║
-    ║  5. Uncomment the fetch block                                 ║
-    ╚═══════════════════════════════════════════════════════════════╝
 
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/qwasar.io/s/AKfycbxTtJ8dt9m39eJWmKPU3ej2VR48ucMAgG7y9hfHDovz7Kd8bLzJsR1BIdGzy3onMkH9eQ/exec';
 
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
